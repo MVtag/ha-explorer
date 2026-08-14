@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
@@ -11,7 +12,18 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .client import ShellyPresenceClient
-from .const import CONF_DEVICE_ID, CONF_MODEL, DOMAIN, MAX_TARGET_SLOTS
+from .const import (
+    CONF_DEVICE_ID,
+    CONF_MAP_X,
+    CONF_MAP_Y,
+    CONF_MODEL,
+    CONF_ROTATION,
+    DEFAULT_MAP_X,
+    DEFAULT_MAP_Y,
+    DEFAULT_ROTATION,
+    DOMAIN,
+    MAX_TARGET_SLOTS,
+)
 
 
 async def async_setup_entry(
@@ -65,6 +77,17 @@ class ExplorerBaseSensor(SensorEntity):
     def available(self) -> bool:
         return self._client.connected
 
+    def _map_position(self, x: float, y: float) -> tuple[float, float]:
+        """Transform Shelly-local metres to Explorer floor-plan metres."""
+        origin_x = float(self._entry.options.get(CONF_MAP_X, DEFAULT_MAP_X))
+        origin_y = float(self._entry.options.get(CONF_MAP_Y, DEFAULT_MAP_Y))
+        rotation = math.radians(
+            float(self._entry.options.get(CONF_ROTATION, DEFAULT_ROTATION))
+        )
+        map_x = origin_x + (x * math.cos(rotation)) - (y * math.sin(rotation))
+        map_y = origin_y + (x * math.sin(rotation)) + (y * math.cos(rotation))
+        return round(map_x, 3), round(map_y, 3)
+
 
 class ExplorerTargetsSensor(ExplorerBaseSensor):
     """Summary sensor for all currently tracked targets."""
@@ -82,9 +105,20 @@ class ExplorerTargetsSensor(ExplorerBaseSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
+        calibrated_targets = []
+        for target in self._client.target_list:
+            item = dict(target)
+            if target.get("x") is not None and target.get("y") is not None:
+                item["map_x"], item["map_y"] = self._map_position(
+                    float(target["x"]), float(target["y"])
+                )
+            calibrated_targets.append(item)
         return {
-            "targets": self._client.target_list,
+            "targets": calibrated_targets,
             "host": self._client.host,
+            "map_origin_x": self._entry.options.get(CONF_MAP_X, DEFAULT_MAP_X),
+            "map_origin_y": self._entry.options.get(CONF_MAP_Y, DEFAULT_MAP_Y),
+            "rotation": self._entry.options.get(CONF_ROTATION, DEFAULT_ROTATION),
         }
 
 
@@ -114,17 +148,15 @@ class ExplorerTargetSensor(ExplorerBaseSensor):
 
     @property
     def native_value(self) -> str:
-        target = self._target
-        if target is None:
-            return "not_detected"
-        return "detected"
+        return "detected" if self._target is not None else "not_detected"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         target = self._target
         if target is None:
             return {"slot": self._slot}
-        return {
+
+        attributes = {
             "slot": self._slot,
             "target_id": target.get("id"),
             "x": target.get("x"),
@@ -134,3 +166,8 @@ class ExplorerTargetSensor(ExplorerBaseSensor):
             "maxz": target.get("maxz"),
             "timestamp": target.get("timestamp"),
         }
+        if target.get("x") is not None and target.get("y") is not None:
+            attributes["map_x"], attributes["map_y"] = self._map_position(
+                float(target["x"]), float(target["y"])
+            )
+        return attributes
