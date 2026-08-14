@@ -1,0 +1,25 @@
+{
+  "title": "Home Assistant Explorer",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tilføj Shelly Presence Gen4",
+        "description": "Forbind Home Assistant Explorer direkte til en Shelly Presence Gen4 på dit lokale netværk.",
+        "data": {
+          "host": "IP-adresse eller værtsnavn"
+        },
+        "data_description": {
+          "host": "Den lokale IP-adresse eller værtsnavnet på Shelly Presence Gen4."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kunne ikke oprette forbindelse til Shelly Presence Gen4.",
+      "not_supported": "Enheden stiller ikke den nødvendige Presence-komponent til rådighed.",
+      "unknown": "Der opstod en uventet fejl."
+    },
+    "abort": {
+      "already_configured": "Denne Shelly Presence Gen4 er allerede konfigureret."
+    }
+  }
+}
