@@ -17,21 +17,20 @@ The integration:
 
 No Shelly Cloud connection is required for live position data.
 
-## Prototype installation
+## Installation with HACS
 
-Until releases/HACS distribution are added, copy:
+Home Assistant Explorer can be installed as a custom HACS integration.
 
-`custom_components/ha_explorer`
+1. Open HACS in Home Assistant.
+2. Open the menu and choose **Custom repositories**.
+3. Add `https://github.com/MVtag/ha-explorer`.
+4. Select **Integration** as the category.
+5. Install **Home Assistant Explorer**.
+6. Restart Home Assistant.
+7. Go to **Settings → Devices & services → Add integration → Home Assistant Explorer**.
+8. Enter the local IP address of the Shelly Presence Gen4.
 
-into your Home Assistant `/config/custom_components/` directory and restart Home Assistant.
-
-Then go to:
-
-**Settings → Devices & services → Add integration → Home Assistant Explorer**
-
-Enter the local IP address of the Shelly Presence Gen4.
-
-For the current development sensor the test IP is expected to be entered manually; do not hard-code device IPs in the integration source.
+During development, the repository can be installed from the default branch before the first tagged release. Tagged releases will use the version in `manifest.json`.
 
 ## Entities
 
@@ -50,6 +49,10 @@ z: 0.04
 minz: 1.76
 maxz: 1.93
 ```
+
+## Development validation
+
+GitHub Actions validates the repository with both HACS validation and Home Assistant hassfest on pushes and pull requests.
 
 ## Next milestones
 
