@@ -21,5 +21,18 @@
     "abort": {
       "already_configured": "This Shelly Presence Gen4 is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Floor-plan calibration",
+        "description": "Set the Shelly sensor position on the Explorer floor plan in metres and its rotation. 0° keeps the Shelly coordinate axes unchanged; positive angles rotate counter-clockwise.",
+        "data": {
+          "map_x": "Sensor X position (m)",
+          "map_y": "Sensor Y position (m)",
+          "rotation": "Sensor rotation (°)"
+        }
+      }
+    }
   }
 }
