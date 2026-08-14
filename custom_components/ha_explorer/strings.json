@@ -1,0 +1,25 @@
+{
+  "title": "Home Assistant Explorer",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Shelly Presence Gen4",
+        "description": "Connect Home Assistant Explorer directly to a Shelly Presence Gen4 on your local network.",
+        "data": {
+          "host": "IP address or hostname"
+        },
+        "data_description": {
+          "host": "The local IP address or hostname of the Shelly Presence Gen4."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the Shelly Presence Gen4.",
+      "not_supported": "The device does not expose the required Presence component.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This Shelly Presence Gen4 is already configured."
+    }
+  }
+}
