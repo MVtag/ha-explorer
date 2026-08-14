@@ -17,7 +17,17 @@ from .client import (
     ShellyPresenceError,
     async_validate_shelly_presence,
 )
-from .const import CONF_DEVICE_ID, CONF_MODEL, DOMAIN
+from .const import (
+    CONF_DEVICE_ID,
+    CONF_MAP_X,
+    CONF_MAP_Y,
+    CONF_MODEL,
+    CONF_ROTATION,
+    DEFAULT_MAP_X,
+    DEFAULT_MAP_Y,
+    DEFAULT_ROTATION,
+    DOMAIN,
+)
 
 
 async def _async_validate_input(hass: HomeAssistant, host: str) -> dict[str, Any]:
@@ -29,6 +39,11 @@ class ExplorerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Home Assistant Explorer."""
 
     VERSION = 1
+
+    @staticmethod
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
+        """Return the options flow."""
+        return ExplorerOptionsFlow()
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -63,4 +78,36 @@ class ExplorerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema({vol.Required(CONF_HOST): str}),
             errors=errors,
+        )
+
+
+class ExplorerOptionsFlow(config_entries.OptionsFlow):
+    """Configure floor-plan calibration for a Presence source."""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Manage calibration options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        options = self.config_entry.options
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_MAP_X,
+                        default=options.get(CONF_MAP_X, DEFAULT_MAP_X),
+                    ): vol.Coerce(float),
+                    vol.Required(
+                        CONF_MAP_Y,
+                        default=options.get(CONF_MAP_Y, DEFAULT_MAP_Y),
+                    ): vol.Coerce(float),
+                    vol.Required(
+                        CONF_ROTATION,
+                        default=options.get(CONF_ROTATION, DEFAULT_ROTATION),
+                    ): vol.All(vol.Coerce(float), vol.Range(min=-360, max=360)),
+                }
+            ),
         )
