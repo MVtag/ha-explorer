@@ -21,5 +21,18 @@
     "abort": {
       "already_configured": "Denne Shelly Presence Gen4 er allerede konfigureret."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kalibrering af plantegning",
+        "description": "Angiv Shelly-sensorens placering på Explorer-plantegningen i meter og dens rotation. 0° beholder Shellys koordinatakser; positive vinkler roterer mod uret.",
+        "data": {
+          "map_x": "Sensorens X-position (m)",
+          "map_y": "Sensorens Y-position (m)",
+          "rotation": "Sensorens rotation (°)"
+        }
+      }
+    }
   }
 }
